@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Data Analysis & Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="container">
+        <section class="hero">
+            <p class="tag">Python • Machine Learning • Time Series</p>
+            <h1>Weather Data Analysis & Prediction</h1>
+            <p>Analyze historical temperature data and estimate future temperature trends using Linear Regression.</p>
+        </section>
+
+        <section class="cards">
+            <div class="card"><span>Latest Temperature</span><strong>{{ latest_temp }} °C</strong><small>{{ latest_date }}</small></div>
+            <div class="card"><span>Average Temperature</span><strong>{{ avg_temp }} °C</strong><small>Historical dataset</small></div>
+            <div class="card"><span>Maximum Temperature</span><strong>{{ max_temp }} °C</strong><small>Historical maximum</small></div>
+            <div class="card"><span>Minimum Temperature</span><strong>{{ min_temp }} °C</strong><small>Historical minimum</small></div>
+        </section>
+
+        <section class="panel">
+            <h2>Generate Prediction</h2>
+            <form method="post">
+                <label for="days">Number of future days (1–365)</label>
+                <input id="days" name="days" type="number" min="1" max="365" value="{{ days }}">
+                <button type="submit">Predict Temperature</button>
+            </form>
+            {% if error %}<p class="error">{{ error }}</p>{% endif %}
+        </section>
+
+        <section class="panel">
+            <h2>Historical Trend</h2>
+            <img src="{{ url_for('static', filename='yearly_trend.png') }}" alt="Yearly temperature trend"
+                 onerror="this.style.display='none'">
+            <p class="note">The web app regenerates its prediction outputs when a request is made.</p>
+        </section>
+
+        <section class="panel">
+            <h2>Future Temperature Predictions</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Date</th><th>Predicted Temperature (°C)</th></tr></thead>
+                    <tbody>
+                    {% for row in predictions %}
+                        <tr>
+                            <td>{{ row["Date"].strftime("%d %b %Y") }}</td>
+                            <td>{{ "%.2f"|format(row["PredictedTemperature"]) }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer>Weather Data Analysis & Prediction • Educational ML Project</footer>
+    </main>
+</body>
+</html>
