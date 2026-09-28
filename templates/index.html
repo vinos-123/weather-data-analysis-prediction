@@ -3,59 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Weather Data Analysis & Prediction</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-    <main class="container">
-        <section class="hero">
-            <p class="tag">Python • Machine Learning • Time Series</p>
-            <h1>Weather Data Analysis & Prediction</h1>
-            <p>Analyze historical temperature data and estimate future temperature trends using Linear Regression.</p>
-        </section>
 
-        <section class="cards">
-            <div class="card"><span>Latest Temperature</span><strong>{{ latest_temp }} °C</strong><small>{{ latest_date }}</small></div>
-            <div class="card"><span>Average Temperature</span><strong>{{ avg_temp }} °C</strong><small>Historical dataset</small></div>
-            <div class="card"><span>Maximum Temperature</span><strong>{{ max_temp }} °C</strong><small>Historical maximum</small></div>
-            <div class="card"><span>Minimum Temperature</span><strong>{{ min_temp }} °C</strong><small>Historical minimum</small></div>
-        </section>
+<main class="container">
 
-        <section class="panel">
-            <h2>Generate Prediction</h2>
-            <form method="post">
-                <label for="days">Number of future days (1–365)</label>
-                <input id="days" name="days" type="number" min="1" max="365" value="{{ days }}">
-                <button type="submit">Predict Temperature</button>
-            </form>
-            {% if error %}<p class="error">{{ error }}</p>{% endif %}
-        </section>
+    <!-- HERO -->
+    <section class="hero">
 
-        <section class="panel">
-            <h2>Historical Trend</h2>
-            <img src="{{ url_for('static', filename='yearly_trend.png') }}" alt="Yearly temperature trend"
-                 onerror="this.style.display='none'">
-            <p class="note">The web app regenerates its prediction outputs when a request is made.</p>
-        </section>
+        <p class="tag">
+            Python • Machine Learning • Random Forest • Time Series
+        </p>
 
-        <section class="panel">
-            <h2>Future Temperature Predictions</h2>
-            <div class="table-wrap">
-                <table>
-                    <thead><tr><th>Date</th><th>Predicted Temperature (°C)</th></tr></thead>
-                    <tbody>
-                    {% for row in predictions %}
-                        <tr>
-                            <td>{{ row["Date"].strftime("%d %b %Y") }}</td>
-                            <td>{{ "%.2f"|format(row["PredictedTemperature"]) }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+        <h1>
+            Weather Data Analysis & Prediction
+        </h1>
+
+        <p>
+            Analyze historical weather data and predict future
+            temperature trends using Machine Learning.
+        </p>
+
+    </section>
+
+
+    <!-- STATISTICS CARDS -->
+    <section class="cards">
+
+        <div class="card">
+            <span>Latest Temperature</span>
+
+            <strong>
+                {{ latest_temperature }} °C
+            </strong>
+
+            <small>
+                {{ latest_date }}
+            </small>
+        </div>
+
+
+        <div class="card">
+            <span>Average Temperature</span>
+
+            <strong>
+                {{ average_temperature }} °C
+            </strong>
+
+            <small>
+                Historical dataset
+            </small>
+        </div>
+
+
+        <div class="card">
+            <span>Maximum Temperature</span>
+
+            <strong>
+                {{ maximum_temperature }} °C
+            </strong>
+
+            <small>
+                Historical maximum
+            </small>
+        </div>
+
+
+        <div class="card">
+            <span>Minimum Temperature</span>
+
+            <strong>
+                {{ minimum_temperature }} °C
+            </strong>
+
+            <small>
+                Historical minimum
+            </small>
+        </div>
+
+    </section>
+
+
+    <!-- MODEL PERFORMANCE -->
+    <section class="panel">
+
+        <h2>
+            Machine Learning Model Performance
+        </h2>
+
+        <div class="cards">
+
+            <div class="card">
+                <span>MAE</span>
+
+                <strong>
+                    {{ mae }} °C
+                </strong>
+
+                <small>
+                    Mean Absolute Error
+                </small>
             </div>
-        </section>
 
-        <footer>Weather Data Analysis & Prediction • Educational ML Project</footer>
-    </main>
+
+            <div class="card">
+                <span>RMSE</span>
+
+                <strong>
+                    {{ rmse }} °C
+                </strong>
+
+                <small>
+                    Root Mean Squared Error
+                </small>
+            </div>
+
+
+            <div class="card">
+                <span>R² Score</span>
+
+                <strong>
+                    {{ r2 }}
+                </strong>
+
+                <small>
+                    Model performance
+                </small>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- PREDICTION FORM -->
+    <section class="panel">
+
+        <h2>
+            Generate Prediction
+        </h2>
+
+        <form method="post">
+
+            <label for="days">
+                Number of future days (1–365)
+            </label>
+
+            <input
+                id="days"
+                name="days"
+                type="number"
+                min="1"
+                max="365"
+                value="{{ days }}"
+                required
+            >
+
+            <button type="submit">
+                Predict Temperature
+            </button>
+
+        </form>
+
+        {% if error %}
+            <p class="error">
+                {{ error }}
+            </p>
+        {% endif %}
+
+    </section>
+
+
+    <!-- HISTORICAL TREND -->
+    <section class="panel">
+
+        <h2>
+            Historical Temperature Trend
+        </h2>
+
+        <img
+            src="{{ url_for('static', filename='yearly_trend.png') }}"
+            alt="Yearly temperature trend"
+            onerror="this.style.display='none'"
+        >
+
+        <p class="note">
+            Historical weather data is analyzed to identify
+            seasonal and yearly temperature patterns.
+        </p>
+
+    </section>
+
+
+    <!-- FUTURE PREDICTIONS -->
+    <section class="panel">
+
+        <h2>
+            Future Temperature Predictions
+        </h2>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Date</th>
+                        <th>Predicted Temperature (°C)</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% if predictions %}
+
+                        {% for row in predictions %}
+
+                            <tr>
+
+                                <td>
+                                    {{ row["Date"] }}
+                                </td>
+
+                                <td>
+                                    {{ "%.2f"|format(row["Temperature"]) }} °C
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+
+                            <td colspan="2">
+                                Enter the number of days above
+                                and click "Predict Temperature".
+                            </td>
+
+                        </tr>
+
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        Weather Data Analysis & Prediction
+        • Educational Machine Learning Project
+
+    </footer>
+
+</main>
+
 </body>
 </html>

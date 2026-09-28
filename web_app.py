@@ -72,9 +72,7 @@ X = df[features]
 
 y = df["Temperature"]
 
-split_index = int(
-    len(df) * 0.80
-)
+split_index = int(len(df) * 0.80)
 
 X_train = X.iloc[:split_index]
 X_test = X.iloc[split_index:]
@@ -101,9 +99,7 @@ model.fit(
 # Evaluation
 # ---------------------------------------------------------
 
-test_predictions = model.predict(
-    X_test
-)
+test_predictions = model.predict(X_test)
 
 mae = mean_absolute_error(
     y_test,
@@ -121,6 +117,7 @@ r2 = r2_score(
     y_test,
     test_predictions
 )
+
 
 print("\n=== Model Evaluation ===")
 print(f"MAE  : {mae:.2f} °C")
@@ -146,7 +143,7 @@ latest_date = df.iloc[-1]["Date"].strftime(
 
 
 # ---------------------------------------------------------
-# Route
+# Main Route
 # ---------------------------------------------------------
 
 @app.route("/", methods=["GET", "POST"])
@@ -172,7 +169,7 @@ def index():
                 min(days, 365)
             )
 
-        except ValueError:
+        except (ValueError, TypeError):
 
             days = 30
 
@@ -256,7 +253,10 @@ def index():
         )
 
 
-        # Fill missing values
+        # ---------------------------------------------
+        # Fill Missing Values
+        # ---------------------------------------------
+
         future["Humidity"] = future[
             "Humidity"
         ].fillna(
@@ -277,7 +277,7 @@ def index():
 
 
         # ---------------------------------------------
-        # Predict
+        # Predict Future Temperature
         # ---------------------------------------------
 
         future_predictions = model.predict(
@@ -285,46 +285,81 @@ def index():
         )
 
 
+        # ---------------------------------------------
+        # Prepare Predictions for HTML
+        # ---------------------------------------------
+
         for date, temperature in zip(
             future["Date"],
             future_predictions
         ):
 
+            formatted_date = date.strftime(
+                "%d %b %Y"
+            )
+
+            formatted_temperature = round(
+                float(temperature),
+                2
+            )
+
             predictions.append({
-                "date": date.strftime(
-                    "%d %b %Y"
-                ),
-                "temperature": round(
-                    float(temperature),
-                    2
-                )
+                "Date": formatted_date,
+                "Temperature": formatted_temperature,
+
+                # Lowercase versions for compatibility
+                "date": formatted_date,
+                "temperature": formatted_temperature
             })
 
 
+    # ---------------------------------------------
+    # Render Dashboard
+    # ---------------------------------------------
+
     return render_template(
         "index.html",
+
         latest_temperature=round(
             latest_temperature,
             2
         ),
+
         average_temperature=round(
             average_temperature,
             2
         ),
+
         maximum_temperature=round(
             maximum_temperature,
             2
         ),
+
         minimum_temperature=round(
             minimum_temperature,
             2
         ),
+
         latest_date=latest_date,
+
         predictions=predictions,
+
         days=days,
-        mae=round(mae, 2),
-        rmse=round(rmse, 2),
-        r2=round(r2, 3)
+
+        mae=round(
+            mae,
+            2
+        ),
+
+        rmse=round(
+            rmse,
+            2
+        ),
+
+        r2=round(
+            r2,
+            3
+        )
     )
 
 
